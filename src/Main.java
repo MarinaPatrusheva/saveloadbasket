@@ -1,16 +1,11 @@
-import java.io.File;
 import java.util.Scanner;
 
 class Main {
     public static void main(String[] args) {
-        File file = new File("Basket.txt");
         Scanner scanner = new Scanner(System.in);
         String[] name = {"Гречка", "Яица", "Молоко"};
         int[] price = {100, 70, 80};
         Basket basket = new Basket(price, name);
-        if(file.exists()) {
-            basket = Basket.loadFromTxtFile(file);
-        }
         System.out.println("Список возможных товаров для покупки :");
         for (int i = 0; i < name.length; i++) {
             System.out.println(i + 1 + "." + name[i] + " " + price[i]);
