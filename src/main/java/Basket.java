@@ -5,6 +5,7 @@ public class Basket {
     private int[] amountList;
     private String[] name;
     private File file = new File("Basket.txt");
+    private File fileLog = new File("log.csv");
 
     public Basket(int[] price, String[] name) {
         this.name = name;
@@ -95,6 +96,15 @@ public class Basket {
 
     protected void setAmountList(int[] amountList) {
         this.amountList = amountList;
+    }
+    public int[] getPrice(){
+        return price;
+    }
+    public String[] getName(){
+        return name;
+    }
+    public int[] getAmountList(){
+        return amountList;
     }
 
     private static boolean fileEmpty(File textFile) {
