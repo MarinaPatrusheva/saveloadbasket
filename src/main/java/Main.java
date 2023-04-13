@@ -15,6 +15,7 @@ class Main {
         if(xml.getLoadTextOrJson()){
             if(xml.getFileLoad().exists()) {
                 basket = Basket.loadFromTxtFile(xml.getFileLoad());
+                basket.setFile(xml.getFileLoad());
             }
         }else {
             if(xml.getFileLoad().exists()){
@@ -38,15 +39,28 @@ class Main {
             try {
                 if (((count == 1) || (count == 0)) && (text.equals("end") || (Integer.parseInt(text.split(" ", 0)[0]) <= name.length) && (Integer.parseInt(text.split(" ", 0)[0]) > 0))) {
                     if (text.equals("end")) {
-                        basket.printCart();
+                        if(xml.getLoadTextOrJson()) {
+                            basket.printCart();
+                        }else{
+                            System.out.println("Ваша корзина: ");
+                            int count1 = 0;
+                            for (int i = 0; i < name.length; i++) {
+                                if (basket.getAmountList()[i] != 0) {
+                                    System.out.println(name[i] + "- " + basket.getAmountList()[i] + " штук " + basket.getAmountList()[i] * price[i] + " цена " + "(" + price[i] + " - стоимость ед.)");
+                                    count1 += basket.getAmountList()[i] * price[i];
+                                }
+                            }
+                        }
                         if(xml.writeLog()){
                             clientLog.exportAsCSV(xml.getFileLog());
                         }
                         break;
                     } else {
-                        basket.addToCart(Integer.parseInt(text.split(" ", 0)[0]) - 1, Integer.parseInt(text.split(" ", 0)[1]));
                         if(!xml.getSaveTextOrJson()){
-                            writeJson();
+                            writeJson(basket, Integer.parseInt(text.split(" ", 0)[0]) - 1, Integer.parseInt(text.split(" ", 0)[1]));
+                            basket = readJson(xml.getFileLoad().getName());
+                        }else{
+                            basket.addToCart(Integer.parseInt(text.split(" ", 0)[0]) - 1, Integer.parseInt(text.split(" ", 0)[1]));
                         }
                         if(xml.getSaveLog()){
                             clientLog.log(Integer.parseInt(text.split(" ", 0)[0]) - 1, Integer.parseInt(text.split(" ", 0)[1]));
@@ -62,8 +76,7 @@ class Main {
         }
     }
 
-    public static void writeJson() {
-        Basket basket1 = Basket.loadFromTxtFile(new File("Basket.txt"));
+    public static void writeJson(Basket basket, int productNum, int amount) {
         JSONObject obj = new JSONObject();
         File file = new File("basket.json");
         if (!file.exists()) {
@@ -76,10 +89,14 @@ class Main {
         JSONArray arrayAmount = new JSONArray();
         JSONArray arrayPrice = new JSONArray();
         JSONArray arrayName = new JSONArray();
-        for (int i = 0; i < basket1.getName().length; i++){
-            arrayName.add(i, basket1.getName()[i]);
-            arrayPrice.add(i, basket1.getPrice()[i]);
-            arrayAmount.add(i, basket1.getAmountList()[i]);
+        for (int i = 0; i < basket.getName().length; i++){
+            arrayName.add(i, basket.getName()[i]);
+            arrayPrice.add(i, basket.getPrice()[i]);
+            if(productNum == i){
+             arrayAmount.add(i, basket.getAmountList()[i] + amount);
+            }else {
+                arrayAmount.add(i, basket.getAmountList()[i]);
+            }
         }
         obj.put("amount", arrayAmount);
         obj.put("price", arrayPrice);

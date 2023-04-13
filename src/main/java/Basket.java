@@ -4,8 +4,7 @@ public class Basket {
     private int[] price;
     private int[] amountList;
     private String[] name;
-    private File file = new File("Basket.txt");
-    private File fileLog = new File("log.csv");
+    private File file;
 
     public Basket(int[] price, String[] name) {
         this.name = name;
@@ -20,13 +19,12 @@ public class Basket {
 
     public void printCart() {
         if (file.exists()) {
-            Basket basket = loadFromTxtFile(file);
             System.out.println("Ваша корзина: ");
             int count = 0;
-            for (int i = 0; i < basket.name.length; i++) {
-                if (basket.amountList[i] != 0) {
-                    System.out.println(basket.name[i] + "- " + basket.amountList[i] + " штук " + basket.amountList[i] * basket.price[i] + " цена " + "(" + basket.price[i] + " - стоимость ед.)");
-                    count += basket.amountList[i] * basket.price[i];
+            for (int i = 0; i < name.length; i++) {
+                if (amountList[i] != 0) {
+                    System.out.println(name[i] + "- " + amountList[i] + " штук " + amountList[i] * price[i] + " цена " + "(" + price[i] + " - стоимость ед.)");
+                    count += amountList[i] * price[i];
                 }
             }
             System.out.println(count);
@@ -109,5 +107,8 @@ public class Basket {
 
     private static boolean fileEmpty(File textFile) {
         return textFile.length() == 0;
+    }
+    public void setFile(File file){
+        this.file = file;
     }
 }
