@@ -5,11 +5,11 @@ import com.google.gson.annotations.Expose;
 import java.io.*;
 
 public class Basket {
-    private int[] price;
-    private int[] amountList;
-    private String[] name;
-    @Expose(serialize = false, deserialize = false)private File file;
-    @Expose(serialize = false, deserialize = false) Gson gson = new GsonBuilder()
+    @Expose(serialize = true, deserialize = true)private int[] price;
+    @Expose(serialize = true, deserialize = true)private int[] amountList;
+    @Expose(serialize = true, deserialize = true)private String[] name;
+    private File file;
+    Gson gson = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
             .create();
 
