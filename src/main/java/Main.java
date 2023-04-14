@@ -1,9 +1,4 @@
-import java.io.*;
 import java.util.Scanner;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.json.simple.*;
-
 class Main {
     public static void main(String[] args) {
         ParserXML xml = new ParserXML();
@@ -19,7 +14,9 @@ class Main {
             }
         }else {
             if(xml.getFileLoad().exists()){
-                basket = readJson(xml.getFileLoad().getName());
+                if(!Basket.fileEmpty(xml.getFileLoad())){
+                basket = basket.readJson(xml.getFileLoad().getName());
+                }
             }
         }
         System.out.println("Список возможных товаров для покупки :");
@@ -57,8 +54,8 @@ class Main {
                         break;
                     } else {
                         if(!xml.getSaveTextOrJson()){
-                            writeJson(basket, Integer.parseInt(text.split(" ", 0)[0]) - 1, Integer.parseInt(text.split(" ", 0)[1]));
-                            basket = readJson(xml.getFileLoad().getName());
+                            basket.writeJson(basket, Integer.parseInt(text.split(" ", 0)[0]) - 1, Integer.parseInt(text.split(" ", 0)[1]), xml.getFileSave().getName());
+                            basket = basket.readJson(xml.getFileLoad().getName());
                         }else{
                             basket.addToCart(Integer.parseInt(text.split(" ", 0)[0]) - 1, Integer.parseInt(text.split(" ", 0)[1]));
                         }
@@ -74,62 +71,5 @@ class Main {
                 continue;
             }
         }
-    }
-
-    public static void writeJson(Basket basket, int productNum, int amount) {
-        JSONObject obj = new JSONObject();
-        File file = new File("basket.json");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        JSONArray arrayAmount = new JSONArray();
-        JSONArray arrayPrice = new JSONArray();
-        JSONArray arrayName = new JSONArray();
-        for (int i = 0; i < basket.getName().length; i++){
-            arrayName.add(i, basket.getName()[i]);
-            arrayPrice.add(i, basket.getPrice()[i]);
-            if(productNum == i){
-             arrayAmount.add(i, basket.getAmountList()[i] + amount);
-            }else {
-                arrayAmount.add(i, basket.getAmountList()[i]);
-            }
-        }
-        obj.put("amount", arrayAmount);
-        obj.put("price", arrayPrice);
-        obj.put("name", arrayName);
-        try (FileWriter fileWriter = new FileWriter(file)) {
-            obj.writeJSONString(fileWriter);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Basket readJson(String fileName) {
-        JSONParser parser = new JSONParser();
-        try {
-            Object obj = parser.parse(new FileReader(fileName));
-            JSONObject jsonObject = (JSONObject) obj;
-            JSONArray arrayAmount = (JSONArray) jsonObject.get("amount");
-            JSONArray arrayPrice = (JSONArray) jsonObject.get("price");
-            JSONArray arrayName = (JSONArray) jsonObject.get("name");
-            int[] price = new int[arrayName.size()];
-            int[] amount = new int[arrayName.size()];
-            String[] name = new String[arrayName.size()];
-            for(int i = 0; i < arrayName.size(); i++){
-                price[i] = (int) (long)arrayPrice.get(i);
-                amount[i] = (int) (long)arrayAmount.get(i);
-                name[i] = (String) arrayName.get(i);
-            }
-            Basket basket = new Basket(price, name);
-            basket.setAmountList(amount);
-            return basket;
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }
