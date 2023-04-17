@@ -3,15 +3,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Basket {
     @Expose(serialize = true, deserialize = true)private int[] price;
     @Expose(serialize = true, deserialize = true)private int[] amountList;
     @Expose(serialize = true, deserialize = true)private String[] name;
     private File file;
-    Gson gson = new GsonBuilder()
-            .excludeFieldsWithoutExposeAnnotation()
-            .create();
 
     public Basket(int[] price, String[] name) {
         this.name = name;
@@ -124,16 +123,9 @@ public class Basket {
     }
 
     public static void writeJson(Basket basket, int productNum, int amount, String fileName) {
-        int[] amountList;
+        int[] amountList = basket.getAmountList();
+        Gson gson = new Gson().newBuilder().excludeFieldsWithoutExposeAnnotation().create();
         File file = new File(fileName);
-        if(fileEmpty(file)){
-            amountList = new int[basket.getName().length];
-            for(int i = 0; i < basket.getName().length; i++){
-                amountList[i] = 0;
-            }
-        }else {
-            amountList = basket.getAmountList();
-        }
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -142,15 +134,17 @@ public class Basket {
             }
         }
         for (int i = 0; i < basket.getName().length; i++) {
-            if (basket.getAmountList()[i] == productNum) {
+            if (i == productNum) {
                 amountList[i] = basket.getAmountList()[i] + amount;
+                basket.setAmountList(amountList);
             }
         }
-        String gson = new Gson().toJson(basket);
-        try (FileWriter fileWriter = new FileWriter(file)) {
-            fileWriter.write(gson);
+        try {
+            Writer writer = Files.newBufferedWriter(Paths.get(fileName));
+            gson.toJson(basket, writer);
+            writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
